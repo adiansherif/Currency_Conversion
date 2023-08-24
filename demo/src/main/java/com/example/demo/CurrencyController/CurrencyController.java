@@ -22,32 +22,36 @@ public class CurrencyController {
     public ResponseEntity<Double> convertCurrency(
             @RequestParam String fromCurrency,
             @RequestParam String toCurrency,
-            @RequestParam Double amount){
-
-        String apiUrl = "https://currencyexchange-wbtr.onrender.com/pair/"+fromCurrency+"/" + toCurrency + "/" + amount;
-
-        double convertedAmount = currencyService.getConversion(apiUrl);
-
-        return ResponseEntity.ok(convertedAmount);
+            @RequestParam Double amount) {
+        try {
+            String apiUrl = "https://currencyexchange-wbtr.onrender.com/pair/"+fromCurrency+"/" + toCurrency + "/" + amount;
+            double convertedAmount = currencyService.getConversion(apiUrl);
+            return ResponseEntity.ok(convertedAmount);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(0.0);
+        }
     }
 
     @GetMapping("/compare")
     public ResponseEntity<LatestDto> compareWithBase(
             @RequestParam String base
     ) {
-        String apiUrl = "https://currencyexchange-wbtr.onrender.com/latest/" + base;
-
-        LatestDto response = currencyService.getComparisonRates(apiUrl);
-
-        return ResponseEntity.ok(response);
+        try {
+            String apiUrl = "https://currencyexchange-wbtr.onrender.com/latest/" + base;
+            LatestDto response = currencyService.getComparisonRates(apiUrl);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new LatestDto()); // Handle the error and return an appropriate response
+        }
     }
 
     @GetMapping("/")
     public ResponseEntity<List<ImageDto>> retrieveImages(){
-        List<ImageDto> currencyImages = currencyService.getAllCurrencyImages();
-        return ResponseEntity.ok(currencyImages);
+        try {
+            List<ImageDto> currencyImages = currencyService.getAllCurrencyImages();
+            return ResponseEntity.ok(currencyImages);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
-
-
-
 }
