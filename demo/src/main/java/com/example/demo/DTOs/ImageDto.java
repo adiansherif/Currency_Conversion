@@ -3,10 +3,14 @@ package com.example.demo.DTOs;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-public class ImageDto {
+@NoArgsConstructor
+public class ImageDto implements Serializable {
     @JsonProperty("currency_code")
     private String currency;
     @JsonProperty("image_url")

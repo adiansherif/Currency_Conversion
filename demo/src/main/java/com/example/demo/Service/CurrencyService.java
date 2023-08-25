@@ -57,6 +57,16 @@ public class CurrencyService {
         return currencyImages;
     }
 
+    public Object getImage(String countryCode){
+        for (Currencies currencyEnum : Currencies.values()) {
+            if (currencyEnum.getCurrency().equalsIgnoreCase(countryCode)) {
+                return new ImageDto(currencyEnum.getCurrency(), currencyEnum.getFlagUrl());
+            }
+        }
+        return "Currency not found";
+
+    }
+
 
 }
 

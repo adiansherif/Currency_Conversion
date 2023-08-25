@@ -4,9 +4,10 @@ import com.example.demo.DTOs.ImageDto;
 import com.example.demo.DTOs.LatestDto;
 import com.example.demo.Service.CurrencyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 
@@ -14,44 +15,59 @@ import java.util.List;
 @RequestMapping("/currency")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequiredArgsConstructor
-public class CurrencyController {
+@EnableCaching
+public class CurrencyController{
 
     private final CurrencyService currencyService;
 
     @GetMapping("/convert")
-    public ResponseEntity<Double> convertCurrency(
+    @Cacheable("conversion")
+    public Double convertCurrency(
             @RequestParam String fromCurrency,
             @RequestParam String toCurrency,
             @RequestParam Double amount) {
         try {
             String apiUrl = "https://currencyexchange-wbtr.onrender.com/pair/"+fromCurrency+"/" + toCurrency + "/" + amount;
-            double convertedAmount = currencyService.getConversion(apiUrl);
-            return ResponseEntity.ok(convertedAmount);
+            return currencyService.getConversion(apiUrl);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(0.0);
+            return 0.0;
         }
     }
-
     @GetMapping("/compare")
-    public ResponseEntity<LatestDto> compareWithBase(
+    @Cacheable("comparison")
+    public LatestDto compareWithBase(
             @RequestParam String base
     ) {
         try {
             String apiUrl = "https://currencyexchange-wbtr.onrender.com/latest/" + base;
-            LatestDto response = currencyService.getComparisonRates(apiUrl);
-            return ResponseEntity.ok(response);
+            return currencyService.getComparisonRates(apiUrl);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new LatestDto()); // Handle the error and return an appropriate response
+            return new LatestDto(); // Handle the error and return an appropriate response
         }
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<ImageDto>> retrieveImages(){
+    @Cacheable("images")
+    public List<ImageDto> retrieveImages(){
         try {
-            List<ImageDto> currencyImages = currencyService.getAllCurrencyImages();
-            return ResponseEntity.ok(currencyImages);
+            return currencyService.getAllCurrencyImages();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            return null;
         }
+    }
+    @GetMapping("/image")
+    @Cacheable("image")
+    public Object retrieveOneImage(@RequestParam String countryCode){
+        try {
+            return currencyService.getImage(countryCode);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @CacheEvict(allEntries = true, value = {"conversion", "comparison", "images", "image"})
+    @PostMapping("/clear-cache")
+    public String clearCache() {
+        return "Cache cleared.";
     }
 }
