@@ -19,11 +19,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CurrencyService {
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     private final Logger logger = LoggerFactory.getLogger(CurrencyService.class);
 
-    public string getConversion(String apiUrl) {
-        // Call the API using RestTemplate and retrieve the response
-           try {
+    public String getConversion(String apiUrl) {
+        try {
             ConversionDto response = restTemplate.getForObject(apiUrl, ConversionDto.class);
             assert response != null;
             Double responseAmount = Double.parseDouble(response.getAmount());
@@ -40,9 +40,15 @@ public class CurrencyService {
         }
     }
 
-    private String convertToJson(Object object) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(object);
+    private String convertToJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            logger.error("Error occurred while serializing to JSON: {}", e.getMessage());
+            return "{\"error\": \"An error occurred while serializing to JSON.\"}";
+        }
     }
+    
 
     public LatestDto getComparisonRates(String apiUrl) {
         try {
