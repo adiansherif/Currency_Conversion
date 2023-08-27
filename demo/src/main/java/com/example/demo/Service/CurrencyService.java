@@ -23,19 +23,25 @@ public class CurrencyService {
 
     public string getConversion(String apiUrl) {
         // Call the API using RestTemplate and retrieve the response
-        try {
+           try {
             ConversionDto response = restTemplate.getForObject(apiUrl, ConversionDto.class);
             assert response != null;
             Double responseAmount = Double.parseDouble(response.getAmount());
             Double conversionRate = Double.parseDouble(response.getConversionRate());
 
             // Calculate the converted amount
+            Double convertedAmount = responseAmount * conversionRate;
 
-            return responseAmount * conversionRate;
-        }catch(Exception e){
+            // Convert the result to JSON
+            return convertToJson(convertedAmount);
+        } catch (Exception e) {
             logger.error("Error occurred while fetching conversion: {}", e.getMessage());
-            return 0.0;
+            return "{\"error\": \"An error occurred while fetching conversion.\"}";
         }
+    }
+
+    private String convertToJson(Object object) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(object);
     }
 
     public LatestDto getComparisonRates(String apiUrl) {
