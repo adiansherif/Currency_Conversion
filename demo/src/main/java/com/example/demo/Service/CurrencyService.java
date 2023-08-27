@@ -21,7 +21,7 @@ public class CurrencyService {
     private final RestTemplate restTemplate;
     private final Logger logger = LoggerFactory.getLogger(CurrencyService.class);
 
-    public double getConversion(String apiUrl) {
+    public string getConversion(String apiUrl) {
         // Call the API using RestTemplate and retrieve the response
         try {
             ConversionDto response = restTemplate.getForObject(apiUrl, ConversionDto.class);
