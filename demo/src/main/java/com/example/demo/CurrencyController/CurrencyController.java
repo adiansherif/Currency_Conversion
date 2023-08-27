@@ -31,10 +31,10 @@ public class CurrencyController{
             String apiUrl = "https://currencyexchange-wbtr.onrender.com/pair/" + fromCurrency + "/" + toCurrency + "/" + amount;
             return currencyService.getConversion(apiUrl);
         } catch (Exception e) {
-            return "{\"error\": \"An error occurred while converting currency.\"}";
+            return convertToJson(new ErrorResponse("An error occurred while converting currency."));
         }
-    
     }
+    
     @GetMapping("/compare")
     @Cacheable("comparison")
     public LatestDto compareWithBase(
@@ -71,5 +71,25 @@ public class CurrencyController{
     @PostMapping("/clear-cache")
     public String clearCache() {
         return "Cache cleared.";
+    }
+}
+private String convertToJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            return "{\"error\": \"An error occurred while serializing to JSON.\"}";
+        }
+    }
+
+    private static class ErrorResponse {
+        private final String error;
+
+        public ErrorResponse(String error) {
+            this.error = error;
+        }
+
+        public String getError() {
+            return error;
+        }
     }
 }
