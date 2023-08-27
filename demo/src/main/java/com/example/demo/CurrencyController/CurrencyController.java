@@ -19,6 +19,7 @@ import java.util.List;
 public class CurrencyController{
 
     private final CurrencyService currencyService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/convert")
     @Cacheable("conversion")
@@ -27,11 +28,12 @@ public class CurrencyController{
             @RequestParam String toCurrency,
             @RequestParam Double amount) {
         try {
-            String apiUrl = "https://currencyexchange-wbtr.onrender.com/pair/"+fromCurrency+"/" + toCurrency + "/" + amount;
-            return currencyService.getConversionAsString(apiUrl);
+            String apiUrl = "https://currencyexchange-wbtr.onrender.com/pair/" + fromCurrency + "/" + toCurrency + "/" + amount;
+            return currencyService.getConversion(apiUrl);
         } catch (Exception e) {
-            return 0.0;
+            return "{\"error\": \"An error occurred while converting currency.\"}";
         }
+    
     }
     @GetMapping("/compare")
     @Cacheable("comparison")
