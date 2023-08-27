@@ -22,13 +22,13 @@ public class CurrencyController{
 
     @GetMapping("/convert")
     @Cacheable("conversion")
-    public Double convertCurrency(
+    public String convertCurrency(
             @RequestParam String fromCurrency,
             @RequestParam String toCurrency,
             @RequestParam Double amount) {
         try {
             String apiUrl = "https://currencyexchange-wbtr.onrender.com/pair/"+fromCurrency+"/" + toCurrency + "/" + amount;
-            return currencyService.getConversion(apiUrl);
+            return currencyService.getConversionAsString(apiUrl);
         } catch (Exception e) {
             return 0.0;
         }
